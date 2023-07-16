@@ -2,11 +2,31 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreTaskRequest;
+use App\Http\Requests\UpdateTaskRequest;
 use App\Models\Task;
+use App\Repositories\TaskRepositoryInterface;
 use Illuminate\Http\Request;
 
 class TaskController extends Controller
 {
+    /**
+     * The task repository instance.
+     *
+     * @var TaskRepositoryInterface
+     */
+    private $taskRepository;
+
+    /**
+     * Create a new TaskStatusController instance.
+     *
+     * @param TaskRepositoryInterface $taskRepository
+     */
+    public function __construct(TaskRepositoryInterface $taskRepository)
+    {
+        $this->taskRepository = $taskRepository;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -14,17 +34,7 @@ class TaskController extends Controller
      */
     public function index()
     {
-        return Task::all();
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        return $this->taskRepository->index();
     }
 
     /**
@@ -33,38 +43,9 @@ class TaskController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreTaskRequest $request)
     {
-        $validatedData = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'status' => 'required|in:1,2,3',
-            'due_date' => 'required|date',
-        ]);
-
-        return Task::create($validatedData);
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
+        return $this->taskRepository->store($request->validated());
     }
 
     /**
@@ -74,18 +55,14 @@ class TaskController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Task $task)
+    public function update(UpdateTaskRequest $request, Task $task)
     {
-        $validatedData = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'status' => 'required|in:1,2,3',
-            'due_date' => 'required|date',
-        ]);
-
-        $task->update($validatedData);
-
-        return $task;
+        return $this->taskRepository->update($task->id, $request->only([
+            'title',
+            'description',
+            'status',
+            'due_date'
+        ]));
     }
 
     /**
@@ -96,8 +73,6 @@ class TaskController extends Controller
      */
     public function destroy(Task $task)
     {
-        $task->delete();
-
-        return response()->json(['message' => 'Task deleted successfully']);
+        return $this->taskRepository->destroy($task);
     }
 }
