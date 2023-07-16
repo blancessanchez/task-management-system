@@ -20,7 +20,9 @@ class TaskApiTest extends TestCase
     {
         $tasks = Task::factory(3)->create();
 
-        $response = $this->get('/api/tasks');
+        $response = $this
+            ->withHeaders(['X-API-Key' => 'abcd'])
+            ->get('/api/tasks');
 
         $response->assertStatus(200);
         $responseData = $response->json();
@@ -45,7 +47,9 @@ class TaskApiTest extends TestCase
             'status' => 1,
         ];
 
-        $response = $this->post('/api/tasks', $newTaskData);
+        $response = $this
+            ->withHeaders(['X-API-Key' => 'abcd'])
+            ->post('/api/tasks', $newTaskData);
 
         $response->assertStatus(201);
         $response->assertJsonStructure(['id', 'title', 'description', 'due_date', 'status', 'created_at', 'updated_at']);

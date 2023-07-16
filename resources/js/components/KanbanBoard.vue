@@ -144,7 +144,6 @@
                                         <option value="3">Done</option>
                                     </select>
                                 </div>
-                                <!-- You can add more fields as needed -->
                                 <button type="submit" class="btn btn-success">Create</button>
                             </form>
                         </div>
@@ -157,7 +156,6 @@
 
 <script>
     import draggable from 'vuedraggable';
-    // import Vue from 'vue';
     import axios from 'axios';
 
     export default {
@@ -278,7 +276,6 @@
             showCreateTaskModal() {
                 this.isCreateTaskModalOpen = true;
             },
-
             closeCreateTaskModal() {
                 this.isCreateTaskModalOpen = false;
                 this.resetNewTask();
@@ -302,7 +299,6 @@
                     }
                 }
             },
-
             resetNewTask() {
                 this.newTask = {
                     title: '',
