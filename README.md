@@ -32,6 +32,8 @@ This project is a simple and user-friendly platform that allows project managers
 ```bash
   php artisan migrate
   php artisan key:generate
+  php artisan db:seed
+  composer install
   npm install
 ```
 
@@ -49,6 +51,13 @@ This project is a simple and user-friendly platform that allows project managers
 ```bash
   php artisan serve
   npm run prod
+```
+
+- Login Credentials
+
+```bash
+  username: user
+  password: password
 ```
 
 - Execute test script
