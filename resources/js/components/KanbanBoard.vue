@@ -178,7 +178,7 @@
                 const newStatus = evt.to.parentElement.children[0].textContent;
 
                 try {
-                    const response = await axios.put(`/api/tasks/${taskId}`, { status: newStatus });
+                    const response = await axios.put(`/api/task-status/${taskId}`, { status: newStatus });
 
                     const updatedTask = this.tasks.find((task) => task.id === taskId);
                     updatedTask.status = Number(newStatus);

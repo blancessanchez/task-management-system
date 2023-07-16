@@ -4995,7 +4995,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               newStatus = evt.to.parentElement.children[0].textContent;
               _context2.prev = 2;
               _context2.next = 5;
-              return axios__WEBPACK_IMPORTED_MODULE_2___default.a.put("/api/tasks/".concat(taskId), {
+              return axios__WEBPACK_IMPORTED_MODULE_2___default.a.put("/api/task-status/".concat(taskId), {
                 status: newStatus
               });
             case 5:
