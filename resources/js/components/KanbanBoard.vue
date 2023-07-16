@@ -21,9 +21,9 @@
                             <div class="drag-handle"></div>
                             <h5 class="card-title">{{ task.title }}</h5>
                             <p class="card-text">{{ task.description }}</p>
-                            <p class="card-text">{{ task.due_date }}</p>
+                            <p class="card-text"><b>Due date:</b> {{ task.due_date }}</p>
                             <div class="d-flex justify-content-between mt-3">
-                                <button class="btn btn-default" @click="openUpdateForm(task)">Edit</button>
+                                <button class="btn btn-primary" @click="openUpdateForm(task)">Edit</button>
                                 <button class="btn btn-danger" @click="confirmDelete(task.id)">Delete</button>
                             </div>
                         </div>

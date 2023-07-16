@@ -1922,7 +1922,6 @@ function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyri
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
-// import Vue from 'vue';
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['apiKey'],
@@ -2242,10 +2241,10 @@ var render = function render() {
         staticClass: "card-text"
       }, [_vm._v(_vm._s(task.description))]), _vm._v(" "), _c("p", {
         staticClass: "card-text"
-      }, [_vm._v(_vm._s(task.due_date))]), _vm._v(" "), _c("div", {
+      }, [_c("b", [_vm._v("Due date:")]), _vm._v(" " + _vm._s(task.due_date))]), _vm._v(" "), _c("div", {
         staticClass: "d-flex justify-content-between mt-3"
       }, [_c("button", {
-        staticClass: "btn btn-default",
+        staticClass: "btn btn-primary",
         on: {
           click: function click($event) {
             return _vm.openUpdateForm(task);
