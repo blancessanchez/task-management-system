@@ -1,0 +1,15 @@
+body {
+    padding-top: 60px;
+}
+.draggable-item {
+    cursor: pointer;
+}
+.drag-handle {
+    cursor: grabbing;
+    display: inline-block;
+    margin-right: 8px;
+    user-select: none;
+}
+.drag-handle:active {
+    cursor: grabbing;
+}

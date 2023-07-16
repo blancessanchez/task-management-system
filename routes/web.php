@@ -14,9 +14,13 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect('/kanban');
 });
 
-Route::get('/kanban', function () {
+Route::get('/login', [App\Http\Controllers\AuthenticatedSessionController::class, 'create']);
+Route::post('/login', [App\Http\Controllers\AuthenticatedSessionController::class, 'store'])->name('login');
+Route::post('/logout', [App\Http\Controllers\AuthenticatedSessionController::class, 'destroy'])->name('logout');
+
+Route::middleware('auth')->get('/kanban', function () {
     return view('kanban');
 });

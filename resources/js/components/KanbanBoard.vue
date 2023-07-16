@@ -1,24 +1,29 @@
 <template>
     <div class="container py-4">
-        <button class="btn btn-primary" @click="showCreateTaskModal">Create Task</button>
+        <div class="row pb-4">
+            <button class="btn btn-primary" @click="showCreateTaskModal">Create Task</button>
+        </div>
         <div class="row justify-content-center">
-            <div class="col-md-4" v-for="status in statuses" :key="status">
-                <h2>{{ status }}</h2>
+            <div class="col-md-4" v-for="status in statuses" :key="status.id">
                 <div class="card bg-light shadow mb-3">
-                    <div class="card-header drag-handle">{{ status }}</div>
+                    <div class="card-header" :data-id="status.id">{{ status.text }}</div>
                     <draggable
-                        :list="getTasksByStatus(status)"
+                        :list="getTasksByStatus(status.id)"
                         group="tasks"
                         @end="onDragEnd"
                         drag-handle=".drag-handle"
                     >
-                        <div class="card-body task draggable-item" v-for="task in getTasksByStatus(status)" :data-id="task.id">
+                        <div
+                            class="card-body task draggable-item"
+                            v-for="task in getTasksByStatus(status.id)"
+                            :data-id="task.id"
+                        >
                             <div class="drag-handle"></div>
                             <h5 class="card-title">{{ task.title }}</h5>
                             <p class="card-text">{{ task.description }}</p>
                             <p class="card-text">{{ task.due_date }}</p>
                             <div class="d-flex justify-content-between mt-3">
-                                <button class="btn btn-primary" @click="openUpdateForm(task)">Edit</button>
+                                <button class="btn btn-default" @click="openUpdateForm(task)">Edit</button>
                                 <button class="btn btn-danger" @click="confirmDelete(task.id)">Delete</button>
                             </div>
                         </div>
@@ -28,7 +33,7 @@
             <div v-if="isUpdateFormOpen" class="modal" tabindex="-1" role="dialog" style="display: block;">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
-                        <form @submit.prevent="updateTask">
+                        <form @submit.prevent="updateTask" novalidate>
                             <div class="modal-header">
                                 <h5 class="modal-title">Edit Task</h5>
                                 <button
@@ -40,6 +45,11 @@
                                 </button>
                             </div>
                             <div class="modal-body">
+                                <div v-if="formErrors.length > 0" class="alert alert-danger">
+                                    <ul>
+                                        <li v-for="error in formErrors" :key="error">{{ error }}</li>
+                                    </ul>
+                                </div>
                                 <div class="form-group">
                                     <label for="title">Title</label>
                                     <input
@@ -75,14 +85,15 @@
                                         id="status"
                                         class="form-control"
                                     >
-                                        <option v-for="status in statuses" :value="status" :key="status">
-                                            {{ status }}
-                                        </option>
+                                        <option value="">-- Select status --</option>
+                                        <option value="1">Todo</option>
+                                        <option value="2">In Progress</option>
+                                        <option value="3">Done</option>
                                     </select>
                                 </div>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-primary" @click="updateTask">Update Task</button>
+                                <button type="button" class="btn btn-success" @click="updateTask">Update Task</button>
                                 <button type="button" class="btn btn-secondary" @click="closeUpdateForm">
                                     Close
                                 </button>
@@ -102,8 +113,12 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            <!-- Create Task Form goes here -->
-                            <form @submit.prevent="createTask">
+                            <div v-if="formErrors.length > 0" class="alert alert-danger">
+                                <ul>
+                                    <li v-for="error in formErrors" :key="error">{{ error }}</li>
+                                </ul>
+                            </div>
+                            <form @submit.prevent="createTask" novalidate>
                                 <div class="form-group">
                                     <label for="title">Title</label>
                                     <input type="text" class="form-control" v-model="newTask.title" required>
@@ -118,10 +133,19 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="title">Status</label>
-                                    <input type="text" class="form-control" v-model="newTask.status" required>
+                                    <select
+                                        v-model="newTask.status"
+                                        id="status"
+                                        class="form-control"
+                                    >
+                                        <option value="">-- Select status --</option>
+                                        <option value="1">Todo</option>
+                                        <option value="2">In Progress</option>
+                                        <option value="3">Done</option>
+                                    </select>
                                 </div>
                                 <!-- You can add more fields as needed -->
-                                <button type="submit" class="btn btn-primary">Create</button>
+                                <button type="submit" class="btn btn-success">Create</button>
                             </form>
                         </div>
                     </div>
@@ -133,17 +157,31 @@
 
 <script>
     import draggable from 'vuedraggable';
-    import Vue from 'vue';
+    // import Vue from 'vue';
     import axios from 'axios';
 
     export default {
+        props: ['apiKey'],
         components: {
             draggable,
         },
         data() {
             return {
                 tasks: [],
-                statuses: [1, 2, 3],
+                statuses: [
+                    {
+                        id: 1,
+                        text: 'Todo'
+                    },
+                    {
+                        id: 2,
+                        text: 'In Progress'
+                    },
+                    {
+                        id: 3,
+                        text: 'Done'
+                    },
+                ],
                 isUpdateFormOpen: false,
                 editedTask: {
                     id: null,
@@ -159,13 +197,16 @@
                     due_date: '',
                     status: '',
                 },
+                formErrors: [],
+                headers: {
+                    'X-API-Key': this.apiKey,
+                }
             };
         },
         methods: {
             async fetchTasks() {
-                const response = await axios.get('/api/tasks');
+                const response = await axios.get('/api/tasks', { headers: this.headers });
                 this.tasks = response.data;
-                console.log(this.tasks)
             },
             getTasksByStatus(status) {
                 return this.tasks.filter((task) => task.status === status);
@@ -175,10 +216,9 @@
             },
             async onDragEnd(evt) {
                 const taskId = Number(evt.item.getAttribute('data-id'));
-                const newStatus = evt.to.parentElement.children[0].textContent;
-
+                const newStatus = evt.to.parentElement.children[0].dataset.id;
                 try {
-                    const response = await axios.put(`/api/task-status/${taskId}`, { status: newStatus });
+                    const response = await axios.put(`/api/task-status/${taskId}`, { id: Number(taskId), status: Number(newStatus) }, { headers: this.headers });
 
                     const updatedTask = this.tasks.find((task) => task.id === taskId);
                     updatedTask.status = Number(newStatus);
@@ -191,19 +231,23 @@
                 this.isUpdateFormOpen = true;
             },
             async updateTask() {
-                console.log('here')
                 try {
-                    const response = await axios.put(`/api/tasks/${this.editedTask.id}`, this.editedTask);
+                    const response = await axios.put(`/api/tasks/${this.editedTask.id}`, this.editedTask, { headers: this.headers });
                     const updatedTask = response.data;
-
                     const taskIndex = this.tasks.findIndex((task) => task.id === updatedTask.id);
                     if (taskIndex !== -1) {
                         this.tasks.splice(taskIndex, 1, updatedTask);
                     }
 
                     this.closeUpdateForm();
+                    this.formErrors = [];
+                    await this.fetchTasks();
                 } catch (error) {
-                    console.error('Error updating task:', error);
+                    if (error.response && error.response.status === 422) {
+                        this.formErrors = Object.values(error.response.data.errors).flat();
+                    } else {
+                        console.error('Error creating task:', error);
+                    }
                 }
             },
             closeUpdateForm() {
@@ -215,10 +259,11 @@
                     due_date: '',
                     status: '',
                 };
+                this.formErrors = [];
             },
             async deleteTask(taskId) {
                 try {
-                    await axios.delete(`/api/tasks/${taskId}`);
+                    await axios.delete(`/api/tasks/${taskId}`, { headers: this.headers });
                     // Remove the deleted task from the frontend
                     this.tasks = this.tasks.filter((task) => task.id !== taskId);
                 } catch (error) {
@@ -240,18 +285,21 @@
             },
             async createTask() {
                 try {
-                    // Send a POST request to create a new task
-                    const response = await axios.post('/api/tasks', this.newTask);
+                    const response = await axios.post('/api/tasks', this.newTask, { headers: this.headers });
                     const createdTask = response.data;
-                    // Add the new task to the frontend
+
                     this.tasks.push(createdTask);
-                    // Close the modal and reset the newTask object
+
                     this.closeCreateTaskModal();
 
-                    // Fetch the updated task list from the server
                     await this.fetchTasks();
+                    this.formErrors = [];
                 } catch (error) {
-                    console.error('Error creating task:', error);
+                    if (error.response && error.response.status === 422) {
+                        this.formErrors = Object.values(error.response.data.errors).flat();
+                    } else {
+                        console.error('Error creating task:', error);
+                    }
                 }
             },
 
@@ -262,6 +310,7 @@
                     due_date: '',
                     status: '',
                 };
+                this.formErrors = [];
             },
         },
         created() {
@@ -269,18 +318,3 @@
         }
     };
 </script>
-
-<style>
-    .draggable-item {
-        cursor: pointer;
-    }
-    .drag-handle {
-        cursor: grabbing;
-        display: inline-block;
-        margin-right: 8px;
-        user-select: none;
-    }
-    .drag-handle:active {
-        cursor: grabbing;
-    }
-</style>

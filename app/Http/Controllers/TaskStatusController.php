@@ -19,7 +19,7 @@ class TaskStatusController extends Controller
         $validatedData = $request->validate([
             'status' => 'required|in:1,2,3',
         ]);
-
+        $task = Task::findOrFail($request->input('id'));
         $task->update($validatedData);
 
         return $task;

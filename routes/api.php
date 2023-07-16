@@ -19,5 +19,5 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
-Route::apiResource('tasks', TaskController::class);
-Route::apiResource('task-status', TaskStatusController::class);
+Route::middleware('api.key')->apiResource('tasks', TaskController::class);
+Route::middleware('api.key')->apiResource('task-status', TaskStatusController::class);

@@ -1,14 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Task Management System - Kanban Board</title>
-</head>
-<body>
-    <div id="app">
-        <kanban-board></kanban-board>
+@extends('layouts.app')
+
+@section('content')
+    <div class="container">
+        <kanban-board :api-key="{{ json_encode(env('TASK_MANAGEMENT_API_KEY')) }}"></kanban-board>
     </div>
-    <script src="{{ asset('js/app.js') }}"></script>
-</body>
-</html>
+@endsection
